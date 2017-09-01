@@ -30,7 +30,43 @@ require File.expand_path(File.dirname(__FILE__) + '/neo')
 # Your goal is to write the score method.
 
 def score(dice)
-  # You need to write this method
+  score = 0
+  occurances = {1=>0, 2=>0, 3=>0, 4=>0, 5=>0, 6=>0}
+  (1..6).each do |num|
+    occurances[num] = dice.count(num)
+  end
+  # Keep 1s and sets of 3s
+  occurances.keep_if do |key, val|
+    (key == 1 || key == 5) || (val % 3 == 0 && val != 0)
+  end
+  # tally ones
+  occurances.each do |key, val|
+    case key
+    when 1
+      score += score_helper(val, 100, 1000)
+    when 5
+      score += score_helper(val, 50, key * 100)
+    else
+      score += score_helper(val, 0, key * 100)
+    end
+  end
+  return score
+end
+
+def score_helper(num, single, triple)
+  # figure if it's divisible by 3
+  counter = num.dup
+  score = 0
+  while counter > 0
+    if counter % 3 == 0
+      counter -= 3
+      score += triple
+    else
+      score += single
+      counter -= 1
+    end
+  end
+  return score
 end
 
 class AboutScoringProject < Neo::Koan
